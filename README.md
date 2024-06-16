@@ -4,4 +4,4 @@ Some scripts I'm adapting as I go used to convert AD scripts to many formats, ad
 
 # Usage.
 
-python gen_ad.py sample.srt -o CompletedSample.csv -f
+python gen_ad.py script_01.srt -o CompletedSample.csv -f

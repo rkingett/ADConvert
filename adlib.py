@@ -6,8 +6,9 @@ from dataclasses import dataclass, field
 from datetime import *
 import re
 import csv
-import json
+import tomli
 
+import json
 #import sys
 #import datetime
 #import glob
@@ -83,16 +84,17 @@ class AdMetaData:
 
 	def load_metadata(self, input_filename:str):
 
+		# We're now using TOML. Much nicer.
 		try:
-			with open(input_filename, "r") as read_file:
-				data = json.load(read_file)
+			with open(input_filename, "rb") as read_file:
+				data = tomli.load(read_file)
 		except:
 			print("Unable to open file " + input_filename)
 			exit()
 
 		self.title = data["title"]
 		self.author = data["author"]
-		self.date = data["date"]
+		self.date = data["date"].strftime("%Y-%m-%d")
 		self.licence = data["licence"]
 		self.rights = data["rights"]
 		self.url = data["url"]
@@ -188,6 +190,17 @@ class AdMetaData:
 		
 		return "{\\creatim\\yr" + x[0] + "\\mo" + x[1] + "\\dy" + x[2] + "}\n"
 
+
+
+def parse_csv(lines:list[str]) -> list[AdEvent]:
+
+	"""
+	Convert a CSV file into internal format, defined as a dataclass
+	"""
+
+	for line in lines:
+		line = line.strip()
+		fields = ','
 
 
 
@@ -627,8 +640,14 @@ def write_webvtt(output_filename:str, ad_script:list[AdEvent], metadata:AdMetaDa
 	# Write cues
 	for event in ad_script:
 		try:
-			webvtt_content.append(str(count) + '\n')
-			count += 1
+			# Adjust Format: 00:00.00
+			# Doubtless there's a more efficent way to do this!
+			event.time_in = event.time_in[3:]
+			event.time_in = event.time_in[0:5] + '.' + event.time_in[6:]
+
+			event.time_out = event.time_out[3:]
+			event.time_out = event.time_out[0:5] + '.' + event.time_out[6:]
+
 			webvtt_content.append(event.time_in + " --> " + event.time_out + '\n')
 			voiceover = event.voice_over 
 			voiceover = voiceover.replace('>','&gt;') # Escape any '>' characters
@@ -682,7 +701,6 @@ def write_adxml(output_filename:str, ad_script:list[AdEvent], metadata:AdMetaDat
 
 
 def write_html(output_filename:str, ad_script:list[AdEvent], metadata:AdMetaData, start_from:int = 1, collapse_lines:bool = False):
-
 	""" HTML output """
 
 	html_content:list[str] = []
