@@ -154,11 +154,11 @@ class AdMetaData:
 	def get_rtf_info_block(self) -> str:
 
 		"""
-			Format metadata for inclusion in RTF file \info block.
+			Format metadata for inclusion in RTF file \\i\\info block.
 			I do not believe subject and keywords are part of the spec, but libre-office
 			and abi-word accept both fields.
 
-			Use the document comment \doccomm field for copyright and URL info.
+			Use the document comment \\doccomm field for copyright and URL info.
 		"""
 
 		infoblock:list[str] = []
@@ -181,7 +181,7 @@ class AdMetaData:
 
 	def get_rtf_date(self) -> str:
 
-		""" Format for RTF date is : {\creatim\yr2023\mo08\dy18} """
+		""" Format for RTF date is : {\\creatim\\yr2023\\mo08\\dy18} """
 		
 		x:list[str]  = self.date.split("-")
 
@@ -455,7 +455,7 @@ def write_kyle(output_filename:str, ad_script:list[AdEvent], metadata:AdMetaData
 		# However, it doesn't survive being opened in another program and saved.
 		# rtf_content.append("\n{\\*\\time_in\n" + event.time_in + "\n}")
 
-		start = "\n\par\par\n" + font_size + " "
+		start = "\n\\par\\par\n" + font_size + " "
 		end = ""
 
 		# For events marked [FAST], bold and underline them
@@ -539,7 +539,7 @@ def write_rtf(output_filename:str, ad_script:list[AdEvent], metadata:AdMetaData 
 
 	rtf_content.append("""{\\rtf1\\ansi\\deflang2057\\widowctrl\\deff0 {\\fonttbl {\\f0 Courier;}{\\f1 Times;}}
 
-{\colortbl
+{\\colortbl
 ;
 \\red128\\green128\\blue128;
 \\red255\\green0\\blue0;
@@ -570,7 +570,7 @@ def write_rtf(output_filename:str, ad_script:list[AdEvent], metadata:AdMetaData 
 
 	for event in ad_script:
 
-		rtf_content.append("\n\par\par\n")
+		rtf_content.append("\n\\par\\par\n")
 
 		voiceover = event.voice_over
 
