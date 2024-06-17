@@ -13,7 +13,6 @@ gen_ad.py csv html rtf srt kyle
 
 def main():
 
-
 	# Process command line options:
 
 	# ... create
@@ -21,7 +20,7 @@ def main():
 
 	# ... add arguments
 	parser.add_argument("file_name", help="The name of the SRT subtitle file to convert")
-	parser.add_argument("-j", help="A JSON file containing metadata (optional)", dest='json_file', type=str) 
+	parser.add_argument("-m", help="A metadata file in TOML format (optional)", dest='metadata_file', type=str) 
 	parser.add_argument("-o", help="Output filename (no extension required)", dest='output_filename', type=str) 
 	parser.add_argument('-f', nargs='+', help="List of formats, separated by space. Possible values are: csv, html, rtf, vtt, kyle, md", dest='formats')
 
@@ -47,9 +46,9 @@ def main():
 	metadata = None
 	filename = None
 
-	if args.json_file != None:
+	if args.metadata_file != None:
 		metadata = AdMetaData()
-		metadata.load_metadata(args.json_file)
+		metadata.load_metadata(args.metadata_file)
 		filename = metadata.filename
 	else:
 		filename = args.output_filename
