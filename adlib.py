@@ -9,7 +9,7 @@ import csv
 import toml
 
 import json
-#import sys
+import sys
 #import datetime
 #import glob
 
@@ -246,7 +246,7 @@ def parse_srt(lines:list[str]) -> list[AdEvent]:
 			current_cue.voice_over = text
 
 			# Check text for directions (eg: [FAST])
-			x = re.findall("(\[[^]]*\])",text,re.MULTILINE)
+			x = re.findall(r"(\[[^]]*\])",text,re.MULTILINE)
 			if x != None:
 				current_cue.direction = x # An array of 1 or more elements
 
@@ -382,8 +382,18 @@ def write_csv(output_filename:str, ad_script:list[AdEvent], collapse_lines:bool 
 
 	""" Render the internal data structure into tab delimited CSV data """
 
+	nl = ''
+
+	# Figure out what line terminator we want to generate
+	if sys.platform.startswith('win'):
+		# Microsoft Windows
+		nl = '\r'
+	else:
+		# Everything else, until it breaks
+		nl = '\r\n'
+
 	with open(output_filename, mode='w') as ad_file:
-		ad_writer = csv.writer(ad_file, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
+		ad_writer = csv.writer(ad_file, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL, lineterminator=nl)
 		count:int = start_from
 
 		for event in ad_script:
@@ -416,7 +426,7 @@ def write_kyle(output_filename:str, ad_script:list[AdEvent], metadata:AdMetaData
 
 	rtf_content.append("""{\\rtf1\\ansi\\deflang2057\\widowctrl\\deff0 {\\fonttbl {\\f0 Helvetica;}{\\f1 Times;}}
 
-{\colortbl
+{\\colortbl
 ;
 \\red128\\green128\\blue128;
 \\red255\\green0\\blue0;
@@ -469,7 +479,7 @@ def write_kyle(output_filename:str, ad_script:list[AdEvent], metadata:AdMetaData
 					start += "{\\b\\ul "
 
 				end = "}"
-				x = re.match("(\[[^]]*\])",voiceover)
+				x = re.match(r"(\[[^]]*\])",voiceover)
 				if x != None:
 					# Note, mypy has no way of knowing that x is not None
 					# but with the above conditional, we guarantee it.
